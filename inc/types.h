@@ -5,8 +5,13 @@
 #define NULL ((void *)0)
 #endif
 
-// Represents true-or-false values
+#ifndef __cplusplus
+#if __STDC_VERSION__ < 202311L
 typedef int bool;
+#endif
+#define true 1
+#define false 0
+#endif
 
 // Explicitly-sized versions of integer types
 typedef __signed char int8;

@@ -18,6 +18,12 @@ FUNCTIONS:	to_physical_address, get_frame_info, tlb_invalidate
 // To load the SS register, the CPL must equal the DPL.  Thus,
 // we must duplicate the segments for the user and the kernel.
 //
+
+uint32 maxpa;
+uint32 number_of_frames;
+uint32 size_of_base_mem;
+uint32 size_of_extended_mem;
+
 struct Segdesc gdt[] =
 	{
 		// 0x0 - unused (always faults -- for trapping NULL far pointers)

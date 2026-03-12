@@ -5,10 +5,11 @@
       "type": "gdb",
       "request": "attach",
       "name": "debug FOS",
-      "remote": true,
-      "target": ":26000",
-      "cwd": "${workspaceRoot}",
       "executable": "obj/kern/kernel",
+      "target": ":26000",
+      "remote": true,
+      "cwd": "${workspaceRoot}",
+      "gdbpath": "/opt/cross/bin/i386-elf-gdb",  // <--- Add this line
       "preLaunchTask": "build-debug"
     }
   ]

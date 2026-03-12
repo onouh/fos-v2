@@ -13,10 +13,10 @@ extern struct Pseudodesc gdt_pd;
 extern char ptr_stack_top[], ptr_stack_bottom[];
 
 // These variables are set by detect_memory()
-uint32 maxpa;				 // Maximum physical address
-uint32 number_of_frames;	 // Amount of physical memory (in frames)
-uint32 size_of_base_mem;	 // Amount of base memory (in bytes)
-uint32 size_of_extended_mem; // Amount of extended memory (in bytes)
+extern uint32 maxpa;				 // Maximum physical address
+extern uint32 number_of_frames;	 // Amount of physical memory (in frames)
+extern uint32 size_of_base_mem;	 // Amount of base memory (in bytes)
+extern uint32 size_of_extended_mem; // Amount of extended memory (in bytes)
 
 extern uint32 *ptr_page_directory;
 extern uint32 phys_page_directory;

@@ -6,19 +6,36 @@
 #	http://aegis.sourceforge.net/auug97.pdf
 #
 
+ifeq ($(OS),Windows_NT)
+    # WINDOWS (MinGW / MSYS2)
+    # Usually requires installing 'gcc-arm-none-eabi' or 'i686-elf-gcc' via MSYS2
+    TOOLPREFIX := i686-elf-
+else
+    UNAME_S := $(shell uname -s)
+    ifeq ($(UNAME_S),Darwin)
+        # MAC (MacPorts)
+        TOOLPREFIX := /opt/local/bin/i386-elf-
+    else
+        # LINUX (Standard)
+        TOOLPREFIX := i386-elf-
+    endif
+endif
+
 V 			:= @
 TOP 		:= .
 OBJDIR 		:= obj
-TOOLPREFIX 	:= i386-elf-
+TOOLPREFIX := /opt/local/bin/i386-elf-
 QEMU 		:= qemu-system-i386
 PERL		:= perl
 IMAGE 		:= $(OBJDIR)/fos.img
 
 CC			:= $(TOOLPREFIX)gcc -m32 -pipe
-GCC_LIB 	:= $(shell $(CC) -print-libgcc-file-name)
+# This points to a more generic 32-bit math helper if it exists
+GCC_LIB := $(shell $(CC) -print-libgcc-file-name)
+$(info VERIFYING MACPORTS LIB: $(GCC_LIB))
 AS			:= $(TOOLPREFIX)as --32
 AR			:= $(TOOLPREFIX)ar
-LD			:= $(TOOLPREFIX)ld -m elf_i386
+LD          := $(TOOLPREFIX)ld -m elf_i386 $(GCC_LIB)
 OBJCOPY		:= $(TOOLPREFIX)objcopy
 OBJDUMP		:= $(TOOLPREFIX)objdump
 NM			:= $(TOOLPREFIX)nm
@@ -27,10 +44,11 @@ NM			:= $(TOOLPREFIX)nm
 # Compiler flags
 # -fno-builtin is required to avoid refs to undefined functions in the kernel.
 # Only optimize to -O1 to discourage inlining, which complicates backtraces.
-CFLAGS	:= -O0 -fno-builtin -I$(TOP) -MD -Wall -Wno-format -Wno-unused -Werror -fno-stack-protector -ggdb -g3
+# CFLAGS	:= -O0 -fno-builtin -I$(TOP) -MD -Wall -Wno-format -Wno-unused -Werror -fno-stack-protector -ggdb -g3
+CFLAGS := -O0 -fno-builtin -I$(TOP) -MD -Wall -Wno-format -Wno-unused -fno-stack-protector -gdwarf-2
 
 # Linker flags for FOS user programs
-ULDFLAGS := -T user/user.ld
+ULDFLAGS := -T user/user.ld $(GCC_LIB)
 
 # Lists that the */Makefrag makefile fragments will add to
 OBJDIRS :=
@@ -51,8 +69,8 @@ all:
 	$(OBJDIR)/lib/%.o \
 	$(OBJDIR)/user/%.o
 
-KERN_CFLAGS := $(CFLAGS) -DFOS_KERNEL -gstabs
-USER_CFLAGS := $(CFLAGS) -DFOS_USER -gstabs
+KERN_CFLAGS := $(CFLAGS) -DFOS_KERNEL -ggdb
+USER_CFLAGS := $(CFLAGS) -DFOS_USER -ggdb
 
 
 # Include Makefrags for subdirectories

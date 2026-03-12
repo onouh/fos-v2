@@ -74,6 +74,7 @@ FOS needs an Linux environment to run as expected. For Windows users, the method
 [dl-toolchain]: https://github.com/YoussefRaafatNasry/fos-v2/releases/tag/toolchain
 [qemu]: https://www.qemu.org/
 [dl-qemu]: https://qemu.weilnetz.de/w64/2020/
+[dl-macports]: https://www.macports.org/install.php
 
 ### 2.2. Windows - WSL
 
@@ -107,6 +108,43 @@ sudo rm i386-elf-toolchain-linux.tar.bz2
 # Update your PATH in your ~/.bashrc file.
 echo 'export PATH="$PATH:/opt/cross/bin"' >> ~/.bashrc
 ```
+
+2.4. macOS
+
+Standard macOS compilers do not support the 32-bit ELF format required for FOS. You must install a cross-compiler via MacPorts to ensure the 32-bit math helper libraries (libgcc.a) are included.
+
+Prerequisites:
+
+[Download][[dl-macports] and Install MacPorts for your macOS version (e.g., Sequoia).
+
+Install QEMU via Homebrew:
+
+```Bash
+brew install qemu
+Install Toolchain:
+```
+
+Open a terminal and run:
+
+```Bash
+sudo port install i386-elf-gcc i386-elf-binutils
+Update Makefile:
+```
+
+Update your TOOLPREFIX in the Makefile to point to the MacPorts binaries:
+
+```Makefile
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Darwin)
+    TOOLPREFIX := /opt/local/bin/i386-elf-
+endif
+```
+
+Debugging and DWARF Errors:
+
+DWARF Errors: If you see DWARF error: can't find .debug_ranges section, you can resolve this by changing -ggdb or -g3 to -gdwarf-2 in your CFLAGS.
+
+Multiple Definition Errors: Modern GCC versions are strict. Ensure global variables (like maxpa) are declared as extern in headers (.h) and defined without extern in exactly one source file (.c).
 
 ## 3. Setup Workspace
 
